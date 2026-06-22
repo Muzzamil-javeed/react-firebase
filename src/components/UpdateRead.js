@@ -3,10 +3,10 @@ import app from "../firebaseConfig";
 import { getDatabase, get, ref } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 
-const Read = () => {
-    const navigate = useNavigate();
+const UpdateRead = () => {
     const [fruitsData, setFruitsData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const fetchData = async () => {
         setLoading(true);
@@ -17,7 +17,17 @@ const Read = () => {
             const snapData = await get(dbRef);
 
             if (snapData.exists()) {
-                setFruitsData(Object.values(snapData.val()));
+
+                const myData = snapData.val();
+                const tempArray = Object.keys(myData).map((firedId) => {
+                    return {
+                        ...myData[firedId],
+                        fruitId: firedId
+
+                    }
+                })
+
+                setFruitsData(tempArray);
             } else {
                 alert("No data found");
             }
@@ -40,20 +50,29 @@ const Read = () => {
             <ul>
                 {fruitsData.map((item, index) => (
                     <li key={index}>
-                        {item.fruitName} : {item.fruitDes}
+                        {item.fruitName} : {item.fruitDes} : {item.fruitId}
+                        <button
+                            className="button1"
+                            onClick={() => {
+                                navigate(`/updatewrite/${item.fruitId}`);
+                            }}
+                        >
+                            Update
+                        </button>
+                        <br />
                     </li>
                 ))}
             </ul>
+
             <br />
             <br />
             <br />
-            <br />
-            <button className="button1" onClick={() => { navigate('/update-read') }}>Go To Up Date</button>
             <br />
             <button className="button1" onClick={() => { navigate('/') }}>Go To Home</button>
+            <button className="button1" onClick={() => { navigate('/read') }}>Go To Read</button>
 
         </div>
     );
 };
 
-export default Read;
+export default UpdateRead;
