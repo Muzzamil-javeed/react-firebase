@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import app from "../firebaseConfig";
-import { getDatabase, get, ref } from "firebase/database";
+import { getDatabase, get, ref, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 
 const UpdateRead = () => {
@@ -39,6 +39,23 @@ const UpdateRead = () => {
         }
     };
 
+    const deleteData = async (fruitId) => {
+        if (!window.confirm("Are you sure you want to delete this item?")) {
+            return;
+        }
+
+        try {
+            const db = getDatabase(app);
+            const dbRef = ref(db, "nature/fruits/" + fruitId);
+            await remove(dbRef);
+            alert("Data deleted successfully!");
+            setFruitsData(fruitsData.filter((item) => item.fruitId !== fruitId));
+        } catch (error) {
+            console.error(error);
+            alert("Error deleting data");
+        }
+    };
+
     return (
         <div>
             <button onClick={fetchData} disabled={loading}>
@@ -58,6 +75,12 @@ const UpdateRead = () => {
                             }}
                         >
                             Update
+                        </button>
+                        <button
+                            className="button1"
+                            onClick={() => deleteData(item.fruitId)}
+                        >
+                            Delete
                         </button>
                         <br />
                     </li>
